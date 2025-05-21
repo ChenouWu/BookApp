@@ -19,13 +19,13 @@ router.post('/register', async (req, res) => {
         if(password.length< 6 ){
            return res.status(400).json({message:"Password should at least 6 characters long"});
         }
+
         const exsitUser = await Users.findOne({email});
 
-        if(exsitUser) return res.status(400).json({message:"User already exis"});
+        if(exsitUser) return res.status(400).json({message:"User already exist"});
 
         //get random avatar
         const profileImage =  `https://api.dicebear.com/9.x/big-ears/svg?seed=￥{username}`;
-
 
         const newUser = new Users({
             email,
@@ -50,6 +50,7 @@ router.post('/register', async (req, res) => {
         res.status(500).json({message:"Internal server error"});
     }
 });
+
 // @desc Login user
  router.post("/login",  async(req, res) => {
     // Login user

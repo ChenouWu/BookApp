@@ -1,5 +1,5 @@
 import express from 'express';
-import Book from '../models/Book.js';
+import Book from '../models/worksout.js';
 import cloudinary from '../libs/cloudinary.js';
 import protectRoutes from '../middleware/auth.middleware.js';
 
