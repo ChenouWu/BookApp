@@ -27,7 +27,7 @@ router.post('/register', async (req, res) => {
         if(exsitUser) return res.status(400).json({message:"User already exist"});
 
         //get random avatar
-        const profileImage =  `https://api.dicebear.com/9.x/big-ears/svg?seed=${username}`;
+        const profileImage =  `https://api.dicebear.com/7.x/big-ears/png?seed=${username}`;
 
         const newUser = new Users({
             email,
