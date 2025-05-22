@@ -13,8 +13,8 @@ const protectRoutes = async (req, res, next) => {
     const user = await Users.findById(decoded.userId).select("-password");
 
     if (!user) return res.status(401).json({ message: "Unauthorized" });
-
     req.user = user;
+    
     next();
   } catch (error) {
     console.error("Auth error:", error);

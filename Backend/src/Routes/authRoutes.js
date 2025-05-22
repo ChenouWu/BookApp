@@ -1,12 +1,14 @@
 import express from 'express';
 import Users from '../models/Users.js';
 import jwt from 'jsonwebtoken';
+import protectRoutes from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
 const generateToken = (userId)=>{
     return jwt.sign({userId},process.env.JWT_SECRET,{expiresIn:'15d'})
 }
+
 // @desc Register a new user
 router.post('/register', async (req, res) => {
     try{
@@ -82,5 +84,36 @@ router.post('/register', async (req, res) => {
     }
 }
 );
+
+// @desc Get user profile
+router.put("/update", protectRoutes, async (req, res) => {
+
+  try {
+    const { username, profileImage } = req.body;
+    const userId = req.user._id; // ✅ 从授权中获取用户 ID
+
+    const updatedUser = await Users.findByIdAndUpdate(
+      userId,
+      { username, profileImage },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      user: {
+        _id: updatedUser._id,
+        email: updatedUser.email,
+        username: updatedUser.username,
+        profileImage: updatedUser.profileImage,
+      },
+    });
+  } catch (error) {
+    console.error("Update user error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 export default router;
