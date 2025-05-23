@@ -12,7 +12,7 @@ const WorkoutSchema = new mongoose.Schema(
     title: { type: String, required: true },
     duration: { type: Number, required: true }, // minutes
     notes: { type: String }, // 可选
-    image: { type: String }, // base64 encoded or URL
+    images: [{ type: String }], // ✅ 改为数组，存多个图片链接
     exercises: [ExerciseSchema],
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -20,11 +20,13 @@ const WorkoutSchema = new mongoose.Schema(
       required: true,
     },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    comments: [{
-      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      text: { type: String, required: true },
-      createdAt: { type: Date, default: Date.now }
-    }]
+    comments: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        text: { type: String, required: true },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true }
 );
