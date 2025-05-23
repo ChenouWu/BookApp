@@ -6,38 +6,43 @@ const router = express.Router();
 
 //post a workout
 router.post("/post", protectRoutes, async (req, res) => {
-      try {
-        const { title, duration, notes, image, exercises } = req.body;
+  try {
+    const { title, duration, notes, images, exercises } = req.body;
 
     if (!title || !duration || !exercises || exercises.length === 0) {
-      return res.status(400).json({ message: "Title, duration, and at least one exercise are required." });
+      return res
+        .status(400)
+        .json({ message: "Title, duration, and at least one exercise are required." });
     }
-    let imageUrl = "";
-    
-    if (image) {
-      const uploadResponse = await cloudinary.uploader.upload(image, {
-        folder: "workouts",
-      });
-      imageUrl = uploadResponse.secure_url;
+
+    const imageUrls = [];
+
+    if (images && Array.isArray(images) && images.length > 0) {
+      for (const base64 of images) {
+        const uploadRes = await cloudinary.uploader.upload(base64, {
+          folder: "workouts",
+        });
+        imageUrls.push(uploadRes.secure_url);
+      }
     }
 
     const newWorkout = new Workout({
       title,
       duration,
       notes,
-      image: imageUrl,
+      images: imageUrls,
       exercises,
       user: req.user._id,
     });
 
     await newWorkout.save();
     res.status(201).json({ message: "Workout plan created successfully." });
-
   } catch (error) {
     console.error("Workout creation error:", error);
     res.status(500).json({ message: error.message });
   }
 });
+
 //get my workouts
 router.get("/getmy", protectRoutes, async (req, res) => {
   try {
