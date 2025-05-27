@@ -110,6 +110,50 @@ router.delete("/delete/:id", protectRoutes, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+// PUT /api/workout/update/:id
+router.put("/update/:id", protectRoutes, async (req, res) => {
+  try {
+    const { title, duration, notes, images, exercises } = req.body;
+
+    const workout = await Workout.findById(req.params.id);
+
+    if (!workout) {
+      return res.status(404).json({ message: "Workout not found" });
+    }
+
+    // 检查是否为本人创建的 workout
+    if (workout.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "You are not authorized to update this workout" });
+    }
+
+
+    const imageUrls = [];
+
+    if (Array.isArray(images) && images.length > 0) {
+      for (const base64 of images) {
+        if (base64.startsWith("data:image")) {
+          const uploadRes = await cloudinary.uploader.upload(base64, { folder: "workouts" });
+          imageUrls.push(uploadRes.secure_url);
+        } else {
+          
+          imageUrls.push(base64);
+        }
+      }
+      workout.images = imageUrls; 
+    }
+    if (title !== undefined) workout.title = title;
+    if (duration !== undefined) workout.duration = duration;
+    if (notes !== undefined) workout.notes = notes;
+    if (exercises !== undefined) workout.exercises = exercises;
+
+    await workout.save();
+
+    res.status(200).json({ message: "Workout updated successfully.", workout });
+  } catch (error) {
+    console.error("Error updating workout:", error);
+    res.status(500).json({ message: error.message });
+  }
+});
 
 
 
