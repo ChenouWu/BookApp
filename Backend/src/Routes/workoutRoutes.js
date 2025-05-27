@@ -141,6 +141,7 @@ router.put("/update/:id", protectRoutes, async (req, res) => {
       }
       workout.images = imageUrls; 
     }
+    
     if (title !== undefined) workout.title = title;
     if (duration !== undefined) workout.duration = duration;
     if (notes !== undefined) workout.notes = notes;
