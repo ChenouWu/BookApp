@@ -85,7 +85,6 @@ router.post('/register', async (req, res) => {
 }
 );
 
-// @desc Get user profile
 router.put("/update", protectRoutes, async (req, res) => {
 
   try {
@@ -114,6 +113,15 @@ router.put("/update", protectRoutes, async (req, res) => {
     console.error("Update user error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
+});
+
+router.get("/getuser/:id", protectRoutes, async (req, res) => {
+
+  const user = await Users.findById(req.params.id).select("username email profileImage location");
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  res.status(200).json({ user });
 });
 
 export default router;
