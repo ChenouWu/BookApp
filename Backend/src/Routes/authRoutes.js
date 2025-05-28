@@ -86,20 +86,21 @@ router.post('/register', async (req, res) => {
 );
 
 router.put("/update", protectRoutes, async (req, res) => {
-
   try {
     const { username, profileImage } = req.body;
-    const userId = req.user._id; // ✅ 从授权中获取用户 ID
+    const userId = req.user._id;
 
-    const updatedUser = await Users.findByIdAndUpdate(
-      userId,
-      { username, profileImage },
-      { new: true }
-    );
-
-    if (!updatedUser) {
+    const existingUser = await Users.findById(userId);
+    if (!existingUser) {
       return res.status(404).json({ message: "User not found" });
     }
+      
+    const updatedFields = {
+      username: username !== undefined ? username : existingUser.username,
+      profileImage: profileImage !== undefined ? profileImage : existingUser.profileImage,
+    };
+
+    const updatedUser = await Users.findByIdAndUpdate(userId, updatedFields, { new: true });
 
     res.status(200).json({
       user: {
@@ -114,6 +115,7 @@ router.put("/update", protectRoutes, async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 router.get("/getuser/:id", protectRoutes, async (req, res) => {
 
